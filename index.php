@@ -37,6 +37,42 @@ $apiURLBase = "https://api.github.com";
 // This URL for this script, used as the redirect URL
 $baseURL = "https://".$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 
-//Start a session so we have a place to store things between redirects
-sessions_starts();
+//Start a session so we have a place to store things between redirects 
+session_start();
+
+if(!isset($_GET['action'])){
+    if(!empty($_SESSION['access_token'])){
+        echo '<h3>logged in </h3>';
+        echo '<p><a href="?action=repos"> View Repos </a> </p>';
+        }
+        
+    else{
+        echo '<h3> Not logged in </h3>';
+        echo '<p><a href="?action=login"> Log In </a> </p>';
+    }
+    die();
+}
+
+
+// Start the login process by sending the user to the Github Login page
+
+if(isset($_GET['action']) && $_GET['action']=='login'){
+    unset($_SESSION['access_token']);
+}
+
+// Generate a random hash:
+$_SESSION['state'] = bin2hex(random_bytes(16));
+
+$params = array(
+    'response_type' => 'code',
+    'client_id' => $githubClientID,
+    'redirect_uri' => $baseURL,
+    'scope' => 'user public_group',
+    'state' => $_SESSION['state']
+);
+
+#Redirect the user to Github's auth page:
+
+header('location: '.$authorizeURL.'?'.http_build_query($params));
+die();
 
