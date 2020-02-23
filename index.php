@@ -22,7 +22,7 @@ function apiRequest($url, $post=FALSE, $headers=array()){
 }
 
 // Fill out values from Github
-$githubClientID = '';
+$githubClientID = '8771161b48146cb81269';
 $githubClientSecret = '';
 
 // This is the url we will send the user to first get their authorization
@@ -35,7 +35,7 @@ $token_URL = "https://github.com/login/oauth/access_token";
 $apiURLBase = "https://api.github.com";
 
 // This URL for this script, used as the redirect URL
-$baseURL = "https://".$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+$baseURL = "http://".$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
 
 //Start a session so we have a place to store things between redirects 
 session_start();
@@ -52,6 +52,7 @@ if(!isset($_GET['action'])){
     }
     die();
 }
+
 
 
 // Start the login process by sending the user to the Github Login page
@@ -71,8 +72,30 @@ $params = array(
     'state' => $_SESSION['state']
 );
 
-#Redirect the user to Github's auth page:
+// Redirect the user to Github's auth page:
 
 header('location: '.$authorizeURL.'?'.http_build_query($params));
 die();
+
+if(isset($_GET['code'])){
+    // Verify the state of the return parameter
+    if ( !isset($_GET['state']) || $_GET['state']!=$_SESSION['state'])
+    {
+        header('location: '.$baseURL.'?error=invalid_state');
+        die();
+    }
+
+// Exchange the auth code for access token
+$token = apiRequest($token_URL, array(
+    'grant_type' => 'authorization_code',
+    'client_id' => $githubClientID,
+    'client_secret' => $githubClientSecret,
+    'redirect_uri' => $baseURL,
+    'code' => $_GET['code']
+));
+
+$_SESSION['access_token'] = $token['access_token'];
+header('location: '.$baseURL);
+die();
+}
 
