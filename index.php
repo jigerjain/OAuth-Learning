@@ -40,6 +40,14 @@ if(isset($_GET['action']) && $_GET['action']=='login'){
     die();
 }
 
+// Logout Functionality
+if(isset($_GET['action']) && $_GET['action']=='logout'){
+    unset($_SESSION['access_token']);
+    header('location: '.$baseURL);
+    die();
+}
+
+// Checking Code and State Parameter for generating token
 if(isset($_GET['code'])){
     // Verify the state of the return parameter
     if ( !isset($_GET['state']) || $_GET['state']!=$_SESSION['state'])
@@ -57,28 +65,30 @@ if(isset($_GET['code'])){
         'code' => $_GET['code']
     ));
     $_SESSION['access_token'] = $token['access_token'];
-
     header('location: '.$baseURL);
+    
     die();
 }
 
+// Calling for repositories as part of using token and calling the Resource Server
 if(isset($_GET['action']) && $_GET['action']=='repos'){
     // Find all repos created by the authenticated user
     $repos = apiRequest($apiURLBase.'user/repos?'.http_build_query(['sort'=>'created', 'direction' => 'desc']));
 
     echo '<ul>';
     foreach($repos as $repo){
-        echo '<li> <a href="' . $repo['html_url']. '"> ' .$repo['name'] . '</a></li>';
+       echo '<li> <a href="' . $repo['html_url']. '"> ' .$repo['name'] . '</a></li>';
     }
-
-    echo '</ul>';
-    
+    echo '</ul>'; 
 }
 
+// Base page
 if(!isset($_GET['action'])){
     if(!empty($_SESSION['access_token'])){
         echo '<h3>logged in </h3>';
         echo '<p><a href="?action=repos"> View Repos </a> </p>';
+
+        echo '<p><a href="?action=logout"> Logout </a> </p>';
         }  
     else{
         echo '<h3> Not logged in </h3>';
@@ -87,28 +97,43 @@ if(!isset($_GET['action'])){
     die();
 }
 
-
 function apiRequest($url, $post=FALSE, $headers=array()){
-   
     $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-
     if($post)
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
     
     $headers = [
         'Accept: application/vnd.github.v3+json, application/json',
-        'User-Agent: http://localhost:80'
+        'User-Agent: http://helloworld:80'
     ];
 
     if(isset($_SESSION['access_token']))
         $headers[] = 'Authorization: Bearer '.$_SESSION['access_token'];
+    
+    $options = array(
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+        CURLOPT_PROXY   => '127.0.0.1',
+        CURLOPT_PROXYPORT => '8080',
+        CURLOPT_HTTPHEADER => $headers
+    );
 
+    /*
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_PROXY , '127.0.0.1');
+    curl_setopt($ch, CURLOPT_PROXYPORT, '8080');
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
+    */
+    
+    curl_setopt_array($ch, $options);
 
     $response = curl_exec($ch);
-
     return json_decode($response, true);
 }
 
