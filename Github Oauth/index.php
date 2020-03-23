@@ -1,8 +1,8 @@
 <?php
 
 // Fill out values from Github
-$githubClientID = '';
-$githubClientSecret = '';
+$githubClientID = '8771161b48146cb81269';
+$githubClientSecret = 'f6f913f55c81b1b9896d02dfcbf752b70d701745';
 
 // This is the url we will send the user to first get their authorization
 $authorizeURL = "https://github.com/login/oauth/authorize";
