@@ -11,7 +11,43 @@
 
     function makeRequest(){
         // To do Oauth calls
-        alert("Request made");
+
+        // Fill out values from Github
+        var appClientID = '';
+        var apppClientSecret = '';
+
+        // This is the url we will send the user to first get their authorization
+        // Github doesn't support implicit flows thus this could be replaced by any other application
+        var authorizeURL = "https://github.com/login/oauth/authorize";
+
+        // This is the endpoint we will request an access token form
+        var token_URL = "https://github.com/login/oauth/access_token";
+
+        // This is the Github base URL for API Requests
+        var apiURLBase = "https://api.github.com/";
+
+        // Redirect URI
+        var redirectUri="http://test.com/callback.html";
+
+        // Scope
+        var scope='user public_group';
+
+        var responseType = "token";
+
+        // This URL for this script, used as the redirect URL
+        // $baseURL = "http://".$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+
+        //Start a session so we have a place to store things between redirects 
+
+        // Auth Endpoint query:
+        var requestEndpoint = authorizeURL + "?" +
+        "response_type=" + encodeURIComponent(responseType) + "&" +
+        "client_id=" + encodeURIComponent(githubClientID) + "&" +
+        "redirect_uri=" + encodeURIComponent(redirectUri) + "&" +
+        "scope=" +encodeURIComponent(scope);  
+        
+        // Send Auth request to endpoint
+        window.location.href = requestEndpoint;
     }
     </script>
 </head>

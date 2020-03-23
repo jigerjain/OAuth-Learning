@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call back</title>
+</head>
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script> 
+$(document).ready(function(){
+    // Extract fragment
+    var fragment = location.hash.replace('#','');
+
+    // Detect fragment is present or not
+    if(fragment !== ""){
+        //Fragment detected
+        var responseProperties = fragment.split("&");
+        // Isolate access token and write it to the "response" div
+        var accessToken = "";
+        for (var i=0;i< responseProperties.length;i++){
+            if(responseProperties[i].indexOf("access_token=")===0){
+                accessToken = responseProperties[i].split("=")[1];
+                $("#response").html("Access Token: " + accessToken);
+                break;
+            }
+        }
+        // Request profile and feed data with access token
+    }
+    else {
+        // No response bro
+        $("#response").html("No response detected");
+    }
+});
+</script>
+
+<body>
+    <div id="response"></div>
+</body>
+</html>
