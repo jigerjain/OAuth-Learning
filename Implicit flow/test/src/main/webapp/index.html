@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth test website</title>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script> $(document).ready(function(){
+        $("#goButton").click(makeRequest);
+    });
+
+    function makeRequest(){
+        // To do Oauth calls
+        alert("Request made");
+    }
+    </script>
+</head>
+<body>
+    <button id="goButton" type="button">Go!</button>
+    <div id="results"></div>
+</body>
+</html>
